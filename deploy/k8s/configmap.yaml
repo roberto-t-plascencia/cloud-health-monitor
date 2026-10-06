@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: healthmon-config
+  labels:
+    app.kubernetes.io/name: healthmon
+data:
+  targets.json: |
+    {
+      "metrics_port": 9100,
+      "workers": 4,
+      "failure_threshold": 3,
+      "targets": [
+        { "name": "github-api", "url": "https://api.github.com/zen", "interval_ms": 30000, "timeout_ms": 5000 },
+        { "name": "google-204", "url": "https://www.google.com/generate_204", "expected_status": 204, "interval_ms": 15000, "timeout_ms": 3000 }
+      ]
+    }

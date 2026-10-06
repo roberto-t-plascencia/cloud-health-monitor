@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: healthmon
+  labels:
+    app.kubernetes.io/name: healthmon
+spec:
+  selector:
+    app.kubernetes.io/name: healthmon
+  ports:
+    - name: metrics
+      port: 9100
+      targetPort: metrics

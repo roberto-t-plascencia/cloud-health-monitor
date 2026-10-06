@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: healthmon
+  labels:
+    app.kubernetes.io/name: healthmon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: healthmon
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: healthmon
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9100"
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: 15   # healthmon exits cleanly on SIGTERM
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: healthmon
+          image: ghcr.io/roberto-t-plascencia/cloud-health-monitor:latest
+          args: ["--config", "/etc/healthmon/targets.json"]
+          ports:
+            - name: metrics
+              containerPort: 9100
+          livenessProbe:
+            httpGet: { path: /healthz, port: metrics }
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /readyz, port: metrics }
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits: { cpu: 200m, memory: 64Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/healthmon
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: healthmon-config
