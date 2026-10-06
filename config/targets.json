@@ -1,0 +1,34 @@
+{
+  "metrics_port": 9100,
+  "workers": 4,
+  "failure_threshold": 3,
+  "targets": [
+    {
+      "name": "google-204",
+      "url": "https://www.google.com/generate_204",
+      "expected_status": 204,
+      "interval_ms": 10000,
+      "timeout_ms": 3000
+    },
+    {
+      "name": "github-api",
+      "url": "https://api.github.com/zen",
+      "interval_ms": 15000,
+      "timeout_ms": 5000,
+      "degraded_latency_ms": 800
+    },
+    {
+      "name": "cloudflare-trace",
+      "url": "https://1.1.1.1/cdn-cgi/trace",
+      "interval_ms": 10000,
+      "timeout_ms": 3000
+    },
+    {
+      "name": "demo-failing",
+      "url": "https://httpbin.org/status/503",
+      "interval_ms": 20000,
+      "timeout_ms": 5000,
+      "retry": { "max_attempts": 3, "base_delay_ms": 250, "max_delay_ms": 2000 }
+    }
+  ]
+}
